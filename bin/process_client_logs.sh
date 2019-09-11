@@ -1,12 +1,12 @@
-tmp_dir=$(mktemp -d -t ci-XXXXXXX)
-echo $tmp_dir
-for f in ../log_files/*.tgz; do tar -xzf $f  -C $tmp_dir; done
-ls -L $tmp_dir/var/log/
-cd $tmp_dir/var/log/
-#grep -r '\bJul\b \b21\b' * > outputfile.txt 
-grep  -rl "Failed password" * | xargs sed -E ""  's/([A-Za-z]+) ([0-9])/wwww/g' > outputfile.txt
-#vi secure-20110724
-vi outputfile.txt
+cd $1
+for f in *.tgz; do tar -xzf $f  -C $1; done
+touch failed_login_data.txt
+grep  -rh "Failed password" --exclude="*.txt" . > failed_login_data.txt
+sed -Ein 's/([A-Za-z]+)\s*([0-9]+)\s*([0-9]+):..:..\s*([0-9a-zA-Z]+)\s*sshd\[.*\]:\s*Failed\s*password\s*for\s*([0-9a-zA-Z._ ]+)\s*from\s*([0-9].+)\s*port\s*([0-9]+)\s*..../\1 \2 \3 \4 \6 /p' "failed_login_data.txt"
+sed -Ein 's/invalid user/ /p' "failed_login_data.txt"
+vi failed_login_data.txt
 
-#add :wn after E when line matches
+#vi secure-20110724
+
+
 
