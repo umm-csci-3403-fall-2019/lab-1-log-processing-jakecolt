@@ -9,8 +9,10 @@ touch tempfile.html
 sed -En 's/\s*([A-Za-z]+)\s*([0-9]+)\s*([0-9]+)\s*([A-Za-z0-9_-]+)\s*([0-9]+.[0-9]+.[0-9]+.[0-9]+)/\5/p' "failed_login_datafull.txt" | sort > tempfile.html 
 touch temptempfile.html
 join tempfile.html $start_dir/etc/country_IP_map.txt > temptempfile.html 
-sed -En 's/([0-9]+.[0-9]+.[0-9]+.[0-9]+)\s*([A-Z]+)/\2/p' "temptempfile.html" | sort | uniq -c | sed -E 's/\s*([0-9]+)\s*([A-Z]+)\s*/data.addRow([\x27\2\x27, \1\]);/' > tempfile.html
+#Find data that matches the "140.113.131.400 DE" format, sort it, count the occurrences, find data that matches the "14124 DE" format, and put it into a temporary file.
+sed -En 's/([0-9]+.[0-9]+.[0-9]+.[0-9]+)\s*([A-Z]+)/\2/p' "temptempfile.html" | sort | uniq -c | sed -En 's/\s*([0-9]+)\s*([A-Z]+)\s*/data.addRow([\x27\2\x27, \1\]);/p' > tempfile.html
 cd "$start_dir"/html_components #Move to wrap contents
+#wrap contents of temporary file
 $start_dir/bin/wrap_contents.sh $input_dir/tempfile.html country_dist $input_dir/country_dist.html
 cd $input_dir
 rm tempfile.html #delete the used files
