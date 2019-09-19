@@ -1,0 +1,25 @@
+scratch_dir=$(mktemp -d)
+start_dir=$(pwd)
+mkdir $scratch_dir/log_files
+for i in $@
+do
+	computer_name=$(basename "$i" _secure.tgz)
+	mkdir $scratch_dir/log_files/$computer_name
+	#cp -r $i $scratch_dir/log_files/$computer_name
+	tar -xf $i -C $scratch_dir/log_files/$computer_name	
+	$start_dir/bin/process_client_logs.sh $scratch_dir/log_files/$computer_name
+done
+
+cd $scratch_dir
+cp  -r $start_dir/html_components $scratch_dir
+mkdir $scratch_dir/bin
+mkdir $scratch_dir/etc
+cp $start_dir/bin/wrap_contents.sh $scratch_dir/bin
+cp $start_dir/etc/country_IP_map.txt $scratch_dir/etc                          
+$start_dir/bin/process_client_logs.sh $scratch_dir/log_files
+$start_dir/bin/create_username_dist.sh $scratch_dir/log_files
+$start_dir/bin/create_hours_dist.sh $scratch_dir/log_files
+$start_dir/bin/create_country_dist.sh $scratch_dir/log_files
+$start_dir/bin/assemble_report.sh $scratch_dir/log_files
+
+mv $scratch_dir/log_files/failed_login_summary.html $start_dir
